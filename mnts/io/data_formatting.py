@@ -332,6 +332,11 @@ class Dcm2NiiConverter:
                                                 description,
                                                 tags['0020|0011'])  # Some series has the same series name, need this
                                                                     # to differentiate
+        # Sanitize invalid Windows filename characters from the filename part
+        parent = str(Path(outname).parent)
+        fname = Path(outname).name
+        fname = re.sub(r'[\\/:*?"<>|]', '-', fname)
+        outname = os.path.join(parent, fname)
         return outname, all_dicom_tags
 
     def process_folder(self):
