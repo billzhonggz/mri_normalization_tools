@@ -254,10 +254,13 @@ class Dcm2NiiConverter:
         # Handle the case when each patient has subfolders for each series.
         # NOTE: use_top_level_fname always overrides id_from_path set above.
         if self.use_top_level_fname:
-            path = str(folder.replace(str(Path(self.root_dir).absolute()), '/')).lstrip(os.sep) # lstrip to make sure its not starting from /
-            self.logger.debug(f"Updated folder path: {folder.replace(str(Path(self.root_dir).absolute()), '/')}")
-            self.logger.debug(f"Path components: {path.split(os.sep)}")
-            id_from_path = path.split(os.sep)[0]
+            root = Path(self.root_dir).resolve().absolute()
+            folder_path = Path(folder)  # already resolved at top of method
+            if folder_path == root:
+                id_from_path = folder_path.name
+            else:
+                rel_parts = folder_path.relative_to(root).parts
+                id_from_path = rel_parts[0]
         self.logger.debug(f"Prefix ID from path: {id_from_path}")
 
         # set

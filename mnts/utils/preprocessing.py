@@ -15,15 +15,22 @@ __all__ = ['recursive_list_dir']
 
 def recursive_list_dir(searchDepth, rootdir):
     r"""
-    Recursively list directories only.
-    """
+    Recursively list directories only up to the specified depth.
 
+    Args:
+        searchDepth (int): Maximum depth to traverse from rootdir (0 = rootdir only).
+        rootdir: The root directory to start the search from.
+    """
     DD = []
+    rootdir = os.path.normpath(rootdir)
     for r, d, f in os.walk(rootdir, followlinks=False):
+        rel = os.path.relpath(r, rootdir)
+        current_depth = 0 if rel == '.' else rel.count(os.sep) + 1
+        if current_depth > searchDepth:
+            d.clear()
+            continue
         if len(f) != 0:
-            # DD.extend([os.path.join(r, dd) for dd in d])
             DD.append(r)
-    # DD.extend(nextlayer)
     return DD
 
 
